@@ -231,6 +231,8 @@ public:
     T m[4][4] = { {1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1} };
 };
 
+typedef CGMatrix4D<float> CGMatrix4Df;
+
 }
 
 #endif // CGMATRIX4D_H_INCLUDED

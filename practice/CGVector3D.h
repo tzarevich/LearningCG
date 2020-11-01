@@ -165,6 +165,21 @@ void Normalize(CGVector3D<T> &v)
 }
 
 template<typename T>
+CGVector3D<T> Normalize(const CGVector3D<T> &v)
+{
+    T len = sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
+    if(len > 0)
+    {
+        T dtr = 1 / len;
+        T nx = v.x * dtr;
+        T ny = v.y * dtr;
+        T nz = v.z * dtr;
+        return CGVector3D<T>(nx, ny, nz);
+    }
+    return CGVector3D<T>(v);
+}
+
+template<typename T>
 T Dot(const CGVector3D<T> &a, const CGVector3D<T> &b)
 {
     return a.x*b.x + a.y*b.y + a.z*b.z;

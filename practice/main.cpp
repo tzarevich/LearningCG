@@ -6,16 +6,20 @@
 #include <fstream>
 #include <algorithm>
 #include "CGVector3D.h"
+#include "CGMatrix4D.h"
 
 using namespace CCG;
 
+//! 获取三维坐标在一维数组中的索引
 #define IX(size, i, j, k) (i * j * k * size + i * j * size + i)
 
+//! 生成0-1之间的随机浮点数
 float drand48()
 {
 	return rand() / (RAND_MAX + 1.0);
 }
 
+//! 保存图像为ppm格式
 void Save(const char *file, const CGVector3Df *v, const int &width, const int &height)
 {
 	std::ofstream ofs;
@@ -43,6 +47,7 @@ void Save(const char *file, const CGVector3Df *v, const int &width, const int &h
 	ofs.close();
 }
 
+//! 双线性插值公式
 CGVector3Df Bilinear(const float &tx, const float &ty,  
 				const CGVector3Df &c00, const CGVector3Df &c10,
 				const CGVector3Df &c01, const CGVector3Df &c11)
@@ -52,8 +57,10 @@ CGVector3Df Bilinear(const float &tx, const float &ty,
 	return a * (1 - ty) + b * ty;
 }
 
+//! 测试二次线性插值
 void TestBilinear()
 {
+	//! 生成插值图像
 	int nImageWidth = 512;
 	int nGridSizeX = 9, nGridSizeY = 9;
 	CGVector3Df *pGrid = new CGVector3Df[(nGridSizeY + 1) * (nGridSizeX + 1)];
@@ -84,6 +91,8 @@ void TestBilinear()
 	}
 	Save("./bilinear.ppm", pImageData, nImageWidth, nImageWidth);
 
+
+	//! 以下代码是生成原图像
 	pPixel = pImageData;
 	int nCellSize = nImageWidth / nGridSizeX;
 	fprintf(stderr, "%d\n", nCellSize);
@@ -109,6 +118,8 @@ void TestBilinear()
 	Save("./input.ppm", pImageData, nImageWidth, nImageWidth);
 }
 
+
+//! 测试三次线性插值
 void TestTrilinear()
 {
 	int nGridSize = 10;
@@ -152,13 +163,40 @@ void TestTrilinear()
 	delete pGrid;
 }
 
+//! 构建相机矩阵
+CGMatrix4Df LookAt(const CGVector3Df &from, const CGVector3Df &to, const CGVector3Df &tmp = CGVector3Df(0, 1, 0))
+{
+	CGVector3Df forward = Normalize<float>(from - to);
+	CGVector3Df right = Cross<float>(Normalize<float>(tmp), forward);
+	CGVector3Df up = Cross<float>(forward, right);
+
+	CGMatrix4Df camToWorld;
+	camToWorld[0][0] = right.x;
+	camToWorld[0][1] = right.y;
+	camToWorld[0][2] = right.z;
+	camToWorld[1][0] = up.x;
+	camToWorld[1][1] = up.y;
+	camToWorld[1][2] = up.z;
+	camToWorld[2][0] = forward.x;
+	camToWorld[2][1] = forward.y;
+	camToWorld[2][2] = forward.z;
+	camToWorld[3][0] = from.x;
+	camToWorld[3][1] = from.y;
+	camToWorld[3][2] = from.z;
+
+	return camToWorld;
+}
+
 float F(float x) { return 2 * x * x; }
 float f(float x) { return 4 * x; }
 
 int main(int argc, char **argv)
 {
 	srand(1308);
+	//! 测试双线性插值
 	//TestBilinear();
+
+	//! 黎曼和估计定积分
 	float a = atof(argv[1]);
 	float b = atof(argv[2]);
 	int N = atoi(argv[3]);
