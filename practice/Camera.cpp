@@ -244,7 +244,6 @@ int main(int agrv, char **argc)
 
 	CGMatrix4Df matCameraToWorld(-0.95424, 0, 0.299041, 0, 0.0861242, 0.95763, 0.274823, 0, -0.28637, 0.288002, -0.913809, 0, -3.734612, 7.610426, -14.152769, 1);
 	CGMatrix4Df matWorldToCamera = matCameraToWorld.Inverse();
-	float fCanvasWidth = 2, fCanvasHeight = 2;
 	for(uint32_t i = 0; i < nTriangles; ++i)
 	{
 		const CGVector3Df &ptWorld0 = verts[Triangles[i*3]];
